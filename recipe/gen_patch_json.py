@@ -707,6 +707,12 @@ def _extract_track_feature(record, feature_name):
 def main():
     # Step 1. Collect initial repodata for all subdirs.
     repodatas = {}
+    # Step 2. Create all patch instructions.
+    prefix_dir = os.getenv("PREFIX")
+
+    if prefix_dir is None:
+        raise ValueError('Set the PREFIX environment variable before running this script.')
+
     for subdir in tqdm.tqdm(SUBDIRS, desc="Downloading repodata"):
         repodata_url = "/".join(
             (CHANNEL_ALIAS, CHANNEL_NAME, subdir, "repodata.json"))
@@ -714,8 +720,6 @@ def main():
         response.raise_for_status()
         repodatas[subdir] = response.json()
 
-    # Step 2. Create all patch instructions.
-    prefix_dir = os.getenv("PREFIX")
     for subdir in SUBDIRS:
         prefix_subdir = join(prefix_dir, subdir)
         if not isdir(prefix_subdir):
